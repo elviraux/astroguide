@@ -124,3 +124,12 @@ export const clearAstroProfile = async (): Promise<void> => {
     throw error;
   }
 };
+
+export const clearAllData = async (): Promise<void> => {
+  try {
+    await AsyncStorage.multiRemove([STORAGE_KEY, ASTRO_PROFILE_KEY]);
+  } catch (error) {
+    console.error('Error clearing all data:', error);
+    throw error;
+  }
+};

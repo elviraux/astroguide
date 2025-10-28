@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, ScrollView, Animated } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Animated, TouchableOpacity, Alert } from 'react-native';
+import { useRouter } from 'expo-router';
 import StarryBackground from '../../components/StarryBackground';
 import { Colors } from '../../constants/colors';
-import { getUserData, UserData } from '../../utils/storage';
+import { getUserData, UserData, clearAllData } from '../../utils/storage';
 
 interface ProfileItemProps {
   label: string;
@@ -48,7 +49,9 @@ const ProfileItem: React.FC<ProfileItemProps> = ({ label, value, delay }) => {
 };
 
 export default function ProfileScreen() {
+  const router = useRouter();
   const [userData, setUserData] = useState<UserData | null>(null);
+  const [resetting, setResetting] = useState(false);
   const titleFadeAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
@@ -63,6 +66,39 @@ export default function ProfileScreen() {
   const loadUserData = async () => {
     const data = await getUserData();
     setUserData(data);
+  };
+
+  const handleResetAccount = () => {
+    Alert.alert(
+      'Are you sure you want to reset?',
+      'This will permanently delete your profile, chart, and chat history. This action cannot be undone.',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'Reset',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              setResetting(true);
+              await clearAllData();
+              // Navigate to welcome screen
+              router.replace('/onboarding/welcome');
+            } catch (error) {
+              setResetting(false);
+              console.error('Error resetting account:', error);
+              Alert.alert(
+                'Error',
+                'Failed to reset account. Please try again.',
+                [{ text: 'OK' }]
+              );
+            }
+          },
+        },
+      ]
+    );
   };
 
   const formatDate = (date: Date): string => {
@@ -126,6 +162,18 @@ export default function ProfileScreen() {
             </View>
           )}
         </View>
+
+        {userData && (
+          <TouchableOpacity
+            style={styles.resetButton}
+            onPress={handleResetAccount}
+            disabled={resetting}
+          >
+            <Text style={styles.resetButtonText}>
+              {resetting ? 'Resetting...' : 'Reset Account'}
+            </Text>
+          </TouchableOpacity>
+        )}
 
         <View style={styles.bottomSpacer} />
       </ScrollView>
@@ -196,6 +244,23 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: `${Colors.lunarWhite}80`,
     textAlign: 'center',
+  },
+  resetButton: {
+    marginTop: 32,
+    paddingVertical: 16,
+    paddingHorizontal: 24,
+    borderRadius: 12,
+    borderWidth: 2,
+    borderColor: Colors.starlightGold,
+    backgroundColor: 'transparent',
+    alignItems: 'center',
+  },
+  resetButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: Colors.starlightGold,
+    textTransform: 'uppercase',
+    letterSpacing: 1,
   },
   bottomSpacer: {
     height: 40,
