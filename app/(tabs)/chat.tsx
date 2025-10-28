@@ -9,7 +9,7 @@ import { getUserData } from '../../utils/storage';
 import { buildMargoContext, buildMargoPrompt } from '../../utils/aiContext';
 
 const NEWELL_API_URL = process.env.EXPO_PUBLIC_NEWELL_API_URL || 'https://newell.staging.fastshot.ai';
-const PROJECT_ID = process.env.EXPO_PUBLIC_PROJECT_ID || '45895021-642c-41e2-b281-f586e3585804';
+const PROJECT_ID = process.env.EXPO_PUBLIC_PROJECT_ID || '45895021-642c-41e2-b281-f526e3585804';
 
 const INITIAL_MESSAGE: ChatMessageType = {
   id: 'initial',
