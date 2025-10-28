@@ -1,14 +1,45 @@
-import React, { useRef } from 'react';
-import { View, Text, StyleSheet, Animated } from 'react-native';
+import React, { useRef, useState, useEffect } from 'react';
+import { View, Text, StyleSheet, Animated, ActivityIndicator } from 'react-native';
 import { Colors } from '../../constants/colors';
 import { PLACEHOLDER_ASTRO_DATA } from '../../constants/astroData';
 import ParallaxBackground from '../../components/ParallaxBackground';
 import AstrologyCard from '../../components/AstrologyCard';
 import NumerologyCard from '../../components/NumerologyCard';
 import PlanetaryCard from '../../components/PlanetaryCard';
+import { getAstroProfile, AstroProfile } from '../../utils/storage';
 
 export default function HomeScreen() {
   const scrollY = useRef(new Animated.Value(0)).current;
+  const [astroData, setAstroData] = useState<AstroProfile | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    loadAstroData();
+  }, []);
+
+  const loadAstroData = async () => {
+    try {
+      const profile = await getAstroProfile();
+      if (profile) {
+        setAstroData(profile);
+      }
+    } catch (error) {
+      console.error('Error loading astro profile:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Use generated data if available, otherwise fall back to placeholder
+  const displayData = astroData || PLACEHOLDER_ASTRO_DATA;
+
+  if (loading) {
+    return (
+      <View style={[styles.container, styles.loadingContainer]}>
+        <ActivityIndicator size="large" color={Colors.starlightGold} />
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -26,22 +57,22 @@ export default function HomeScreen() {
           {/* Header */}
           <View style={styles.header}>
             <Text style={styles.greeting}>
-              Hello, {PLACEHOLDER_ASTRO_DATA.user.name} ✨
+              Hello, {displayData.user.name} ✨
             </Text>
             <Text style={styles.subtitle}>Your cosmic blueprint awaits</Text>
           </View>
 
           {/* Astrology Card */}
-          <AstrologyCard bigThree={PLACEHOLDER_ASTRO_DATA.bigThree} />
+          <AstrologyCard bigThree={displayData.bigThree} />
 
           {/* Numerology Card */}
           <NumerologyCard
-            lifePath={PLACEHOLDER_ASTRO_DATA.numerology.lifePath}
-            destiny={PLACEHOLDER_ASTRO_DATA.numerology.destiny}
+            lifePath={displayData.numerology.lifePath}
+            destiny={displayData.numerology.destiny}
           />
 
           {/* Planetary Positions Card */}
-          <PlanetaryCard positions={PLACEHOLDER_ASTRO_DATA.planetaryPositions} />
+          <PlanetaryCard positions={displayData.planetaryPositions} />
 
           {/* Bottom spacing */}
           <View style={styles.bottomSpacer} />
@@ -55,6 +86,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: Colors.cosmicMidnightBlue,
+  },
+  loadingContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   scrollView: {
     flex: 1,

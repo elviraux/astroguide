@@ -1,33 +1,34 @@
-import { UserData } from './storage';
+import { UserData, AstroProfile } from './storage';
 import { PLACEHOLDER_ASTRO_DATA } from '../constants/astroData';
 
-export const buildMargoContext = (userData?: UserData | null): string => {
-  // Use real user data if available, otherwise use placeholder
-  const name = userData?.fullName || PLACEHOLDER_ASTRO_DATA.user.name;
+export const buildMargoContext = (userData?: UserData | null, astroProfile?: AstroProfile | null): string => {
+  // Use real data if available, otherwise use placeholder
+  const profile = astroProfile || PLACEHOLDER_ASTRO_DATA;
+  const name = userData?.fullName || profile.user.name;
 
   const context = `You are Margo, a wise and friendly AI astrologer. You are having a conversation with ${name}.
 
 Here is ${name}'s birth chart information:
 
 ASTROLOGICAL PROFILE (The Big Three):
-- Sun Sign: ${PLACEHOLDER_ASTRO_DATA.bigThree.sun.sign}
-  ${PLACEHOLDER_ASTRO_DATA.bigThree.sun.description}
+- Sun Sign: ${profile.bigThree.sun.sign}
+  ${profile.bigThree.sun.description}
 
-- Moon Sign: ${PLACEHOLDER_ASTRO_DATA.bigThree.moon.sign}
-  ${PLACEHOLDER_ASTRO_DATA.bigThree.moon.description}
+- Moon Sign: ${profile.bigThree.moon.sign}
+  ${profile.bigThree.moon.description}
 
-- Rising Sign: ${PLACEHOLDER_ASTRO_DATA.bigThree.rising.sign}
-  ${PLACEHOLDER_ASTRO_DATA.bigThree.rising.description}
+- Rising Sign: ${profile.bigThree.rising.sign}
+  ${profile.bigThree.rising.description}
 
 NUMEROLOGY PROFILE:
-- Life Path Number: ${PLACEHOLDER_ASTRO_DATA.numerology.lifePath.value}
-  ${PLACEHOLDER_ASTRO_DATA.numerology.lifePath.description}
+- Life Path Number: ${profile.numerology.lifePath.value}
+  ${profile.numerology.lifePath.description}
 
-- Destiny Number: ${PLACEHOLDER_ASTRO_DATA.numerology.destiny.value}
-  ${PLACEHOLDER_ASTRO_DATA.numerology.destiny.description}
+- Destiny Number: ${profile.numerology.destiny.value}
+  ${profile.numerology.destiny.description}
 
 PLANETARY POSITIONS:
-${PLACEHOLDER_ASTRO_DATA.planetaryPositions.map(p => `- ${p.planet} in ${p.sign}`).join('\n')}
+${profile.planetaryPositions.map(p => `- ${p.planet} in ${p.sign}`).join('\n')}
 
 Your role:
 - Provide personalized astrological insights based on ${name}'s chart

@@ -1,15 +1,18 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, Modal } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import StarryBackground from '../../components/StarryBackground';
 import CosmicButton from '../../components/CosmicButton';
+import CosmicLoadingScreen from '../../components/CosmicLoadingScreen';
 import { Colors } from '../../constants/colors';
-import { saveUserData } from '../../utils/storage';
+import { saveUserData, saveAstroProfile } from '../../utils/storage';
+import { generateAstroProfile } from '../../utils/astroAI';
 
 export default function ConfirmationScreen() {
   const router = useRouter();
   const params = useLocalSearchParams();
   const [loading, setLoading] = useState(false);
+  const [generating, setGenerating] = useState(false);
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -32,21 +35,36 @@ export default function ConfirmationScreen() {
   const handleConfirm = async () => {
     try {
       setLoading(true);
-      await saveUserData({
+
+      // Save user data first
+      const userData = {
         fullName: params.name as string,
         dateOfBirth: new Date(params.birthDate as string),
         timeOfBirth: new Date(params.birthTime as string),
         locationOfBirth: params.birthLocation as string,
-      });
+      };
+      await saveUserData(userData);
 
-      // Navigate to home tabs after successful save
+      // Show generating screen
+      setLoading(false);
+      setGenerating(true);
+
+      // Generate astro profile using AI
+      const astroProfile = await generateAstroProfile(userData);
+
+      // Save the generated profile
+      await saveAstroProfile(astroProfile);
+
+      // Navigate to home tabs after successful generation
+      setGenerating(false);
       router.replace('/(tabs)/home');
     } catch (err) {
       setLoading(false);
-      console.error('Error saving user data:', err);
+      setGenerating(false);
+      console.error('Error generating profile:', err);
       Alert.alert(
         'Error',
-        'Failed to save your information. Please try again.',
+        'Failed to generate your cosmic profile. Please try again.',
         [{ text: 'OK' }]
       );
     }
@@ -57,49 +75,55 @@ export default function ConfirmationScreen() {
   };
 
   return (
-    <StarryBackground>
-      <ScrollView style={styles.scrollView} contentContainerStyle={styles.container}>
-        <View style={styles.content}>
-          <View style={styles.header}>
-            <Text style={styles.title}>Confirm Your Details</Text>
-            <Text style={styles.subtitle}>Make sure everything looks right</Text>
+    <>
+      <StarryBackground>
+        <ScrollView style={styles.scrollView} contentContainerStyle={styles.container}>
+          <View style={styles.content}>
+            <View style={styles.header}>
+              <Text style={styles.title}>Confirm Your Details</Text>
+              <Text style={styles.subtitle}>Make sure everything looks right</Text>
+            </View>
+
+            <View style={styles.infoContainer}>
+              <View style={styles.infoCard}>
+                <Text style={styles.infoLabel}>Name</Text>
+                <Text style={styles.infoValue}>{params.name}</Text>
+              </View>
+
+              <View style={styles.infoCard}>
+                <Text style={styles.infoLabel}>Date of Birth</Text>
+                <Text style={styles.infoValue}>{formatDate(params.birthDate as string)}</Text>
+              </View>
+
+              <View style={styles.infoCard}>
+                <Text style={styles.infoLabel}>Time of Birth</Text>
+                <Text style={styles.infoValue}>{formatTime(params.birthTime as string)}</Text>
+              </View>
+
+              <View style={styles.infoCard}>
+                <Text style={styles.infoLabel}>Location of Birth</Text>
+                <Text style={styles.infoValue}>{params.birthLocation}</Text>
+              </View>
+            </View>
           </View>
 
-          <View style={styles.infoContainer}>
-            <View style={styles.infoCard}>
-              <Text style={styles.infoLabel}>Name</Text>
-              <Text style={styles.infoValue}>{params.name}</Text>
-            </View>
-
-            <View style={styles.infoCard}>
-              <Text style={styles.infoLabel}>Date of Birth</Text>
-              <Text style={styles.infoValue}>{formatDate(params.birthDate as string)}</Text>
-            </View>
-
-            <View style={styles.infoCard}>
-              <Text style={styles.infoLabel}>Time of Birth</Text>
-              <Text style={styles.infoValue}>{formatTime(params.birthTime as string)}</Text>
-            </View>
-
-            <View style={styles.infoCard}>
-              <Text style={styles.infoLabel}>Location of Birth</Text>
-              <Text style={styles.infoValue}>{params.birthLocation}</Text>
-            </View>
+          <View style={styles.buttonContainer}>
+            <TouchableOpacity style={styles.editButton} onPress={handleEdit}>
+              <Text style={styles.editButtonText}>Edit Information</Text>
+            </TouchableOpacity>
+            <CosmicButton
+              title="Confirm"
+              onPress={handleConfirm}
+              loading={loading}
+            />
           </View>
-        </View>
+        </ScrollView>
+      </StarryBackground>
 
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity style={styles.editButton} onPress={handleEdit}>
-            <Text style={styles.editButtonText}>Edit Information</Text>
-          </TouchableOpacity>
-          <CosmicButton
-            title="Confirm"
-            onPress={handleConfirm}
-            loading={loading}
-          />
-        </View>
-      </ScrollView>
-    </StarryBackground>
+      <Modal visible={generating} animationType="fade" statusBarTranslucent>
+        <CosmicLoadingScreen />
+      </Modal>
+    </>
   );
 }
 

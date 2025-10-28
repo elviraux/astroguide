@@ -5,7 +5,7 @@ import ChatMessage from '../../components/ChatMessage';
 import ChatInput from '../../components/ChatInput';
 import TypingIndicator from '../../components/TypingIndicator';
 import { ChatMessage as ChatMessageType } from '../../types/chat';
-import { getUserData } from '../../utils/storage';
+import { getUserData, getAstroProfile } from '../../utils/storage';
 import { buildMargoContext, buildMargoPrompt } from '../../utils/aiContext';
 
 const NEWELL_API_URL = process.env.EXPO_PUBLIC_NEWELL_API_URL || 'https://newell.staging.fastshot.ai';
@@ -30,7 +30,8 @@ export default function ChatScreen() {
 
   const loadUserContext = async () => {
     const userData = await getUserData();
-    const margoContext = buildMargoContext(userData);
+    const astroProfile = await getAstroProfile();
+    const margoContext = buildMargoContext(userData, astroProfile);
     setContext(margoContext);
   };
 
