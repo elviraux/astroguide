@@ -1,7 +1,7 @@
 import { UserData, AstroProfile } from './storage';
 import { PLACEHOLDER_ASTRO_DATA } from '../constants/astroData';
 
-const SYSTEM_PROMPT = `You are Margo, an expert astrologer and numerologist. Your tone is insightful, direct, and practical. Avoid clichés and vague spiritual buzzwords. Get straight to the point. You have the user's complete chart data. Use this specific data to provide clear, actionable advice on topics like career, love, decision-making, and personal growth. Connect every answer directly to their specific planetary placements and key numbers.`;
+const SYSTEM_PROMPT = `You are Margo, an expert astrologer and numerologist. Your tone is insightful, direct, and practical. Avoid clichés and vague spiritual buzzwords. Get straight to the point. You have the user's complete chart data. Use this specific data to provide clear, actionable advice on topics like career, love, decision-making, and personal growth. Connect every answer directly to their specific planetary placements and key numbers. IMPORTANT: Keep all responses concise with a maximum of 5-6 sentences.`;
 
 export const buildMargoContext = (userData?: UserData | null, astroProfile?: AstroProfile | null): string => {
   // Use real data if available, otherwise use placeholder
@@ -43,7 +43,7 @@ INSTRUCTIONS:
 - For personal growth: Integrate Sun, Moon, Rising signs with Life Path insights
 - Be direct and specific—cite exact placements and numbers
 - Provide actionable advice, not just descriptions
-- Keep responses focused and practical (2-3 concise paragraphs)
+- Keep responses concise: maximum 5-6 sentences total
 - Use their actual chart data in every response`;
 
   return context;
@@ -59,6 +59,7 @@ RESPONSE REQUIREMENTS:
 - Connect the advice directly to their astrological/numerological data
 - Be clear, direct, and actionable
 - No generic advice—everything must tie to their specific chart
+- CRITICAL: Limit your response to exactly 5-6 sentences maximum
 
 Now respond as Margo:`;
 };

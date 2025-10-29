@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { View, ActivityIndicator, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
-import { getUserData } from '../utils/storage';
+import { getUserData, clearAllData } from '../utils/storage';
 import { Colors } from '../constants/colors';
 
 export default function Index() {
@@ -11,6 +11,7 @@ export default function Index() {
     const checkOnboardingStatus = async () => {
       try {
         const userData = await getUserData();
+        await clearAllData();
 
         // Add a small delay for smooth transition
         setTimeout(() => {
