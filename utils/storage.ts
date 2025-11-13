@@ -133,3 +133,117 @@ export const clearAllData = async (): Promise<void> => {
     throw error;
   }
 };
+
+// Daily Content Storage
+interface DailyContent {
+  content: string;
+  date: string; // ISO date string (YYYY-MM-DD)
+}
+
+interface WeeklyContent {
+  content: string;
+  topic: string;
+  weekStart: string; // ISO date string of Monday
+}
+
+const TODAY_INSIGHT_KEY = '@astroguide_today_insight';
+const DAILY_AFFIRMATION_KEY = '@astroguide_daily_affirmation';
+const COSMIC_SPOTLIGHT_KEY = '@astroguide_cosmic_spotlight';
+
+const getTodayDate = (): string => {
+  const today = new Date();
+  return today.toISOString().split('T')[0]; // YYYY-MM-DD
+};
+
+const getWeekStart = (): string => {
+  const today = new Date();
+  const day = today.getDay();
+  const diff = today.getDate() - day + (day === 0 ? -6 : 1); // Adjust to Monday
+  const monday = new Date(today.setDate(diff));
+  return monday.toISOString().split('T')[0];
+};
+
+export const getTodayInsight = async (): Promise<string | null> => {
+  try {
+    const jsonValue = await AsyncStorage.getItem(TODAY_INSIGHT_KEY);
+    if (!jsonValue) return null;
+    const data: DailyContent = JSON.parse(jsonValue);
+    if (data.date === getTodayDate()) {
+      return data.content;
+    }
+    return null;
+  } catch (error) {
+    console.error('Error loading today insight:', error);
+    return null;
+  }
+};
+
+export const saveTodayInsight = async (content: string): Promise<void> => {
+  try {
+    const data: DailyContent = {
+      content,
+      date: getTodayDate(),
+    };
+    await AsyncStorage.setItem(TODAY_INSIGHT_KEY, JSON.stringify(data));
+  } catch (error) {
+    console.error('Error saving today insight:', error);
+    throw error;
+  }
+};
+
+export const getDailyAffirmation = async (): Promise<string | null> => {
+  try {
+    const jsonValue = await AsyncStorage.getItem(DAILY_AFFIRMATION_KEY);
+    if (!jsonValue) return null;
+    const data: DailyContent = JSON.parse(jsonValue);
+    if (data.date === getTodayDate()) {
+      return data.content;
+    }
+    return null;
+  } catch (error) {
+    console.error('Error loading daily affirmation:', error);
+    return null;
+  }
+};
+
+export const saveDailyAffirmation = async (content: string): Promise<void> => {
+  try {
+    const data: DailyContent = {
+      content,
+      date: getTodayDate(),
+    };
+    await AsyncStorage.setItem(DAILY_AFFIRMATION_KEY, JSON.stringify(data));
+  } catch (error) {
+    console.error('Error saving daily affirmation:', error);
+    throw error;
+  }
+};
+
+export const getCosmicSpotlight = async (): Promise<{ content: string; topic: string } | null> => {
+  try {
+    const jsonValue = await AsyncStorage.getItem(COSMIC_SPOTLIGHT_KEY);
+    if (!jsonValue) return null;
+    const data: WeeklyContent = JSON.parse(jsonValue);
+    if (data.weekStart === getWeekStart()) {
+      return { content: data.content, topic: data.topic };
+    }
+    return null;
+  } catch (error) {
+    console.error('Error loading cosmic spotlight:', error);
+    return null;
+  }
+};
+
+export const saveCosmicSpotlight = async (content: string, topic: string): Promise<void> => {
+  try {
+    const data: WeeklyContent = {
+      content,
+      topic,
+      weekStart: getWeekStart(),
+    };
+    await AsyncStorage.setItem(COSMIC_SPOTLIGHT_KEY, JSON.stringify(data));
+  } catch (error) {
+    console.error('Error saving cosmic spotlight:', error);
+    throw error;
+  }
+};

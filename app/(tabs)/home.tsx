@@ -6,6 +6,9 @@ import ParallaxBackground from '../../components/ParallaxBackground';
 import AstrologyCard from '../../components/AstrologyCard';
 import NumerologyCard from '../../components/NumerologyCard';
 import PlanetaryCard from '../../components/PlanetaryCard';
+import TodayInsightCard from '../../components/TodayInsightCard';
+import DailyAffirmationCard from '../../components/DailyAffirmationCard';
+import CosmicSpotlightCard from '../../components/CosmicSpotlightCard';
 import { getAstroProfile, AstroProfile } from '../../utils/storage';
 
 export default function HomeScreen() {
@@ -33,6 +36,13 @@ export default function HomeScreen() {
   // Use generated data if available, otherwise fall back to placeholder
   const displayData = astroData || PLACEHOLDER_ASTRO_DATA;
 
+  const getTimeBasedGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return 'Good morning';
+    if (hour < 18) return 'Good afternoon';
+    return 'Good evening';
+  };
+
   if (loading) {
     return (
       <View style={[styles.container, styles.loadingContainer]}>
@@ -54,18 +64,30 @@ export default function HomeScreen() {
           )}
           scrollEventThrottle={16}
         >
-          {/* Header */}
+          {/* Enhanced Header */}
           <View style={styles.header}>
             <Text style={styles.greeting}>
-              Hello, {displayData.user.name} ✨
+              {getTimeBasedGreeting()}, {displayData.user.name}
             </Text>
-            <Text style={styles.subtitle}>Your cosmic blueprint awaits</Text>
+            <Text style={styles.subtitle}>The cosmos has a message for you</Text>
           </View>
 
-          {/* Astrology Card */}
+          {/* Today's Insight */}
+          <TodayInsightCard sunSign={displayData.bigThree.sun.sign} />
+
+          {/* Daily Affirmation */}
+          <DailyAffirmationCard
+            sunSign={displayData.bigThree.sun.sign}
+            lifePath={displayData.numerology.lifePath.value}
+          />
+
+          {/* Cosmic Spotlight */}
+          <CosmicSpotlightCard astroProfile={displayData} />
+
+          {/* Astrology Profile */}
           <AstrologyCard bigThree={displayData.bigThree} />
 
-          {/* Numerology Card */}
+          {/* Numerology Profile */}
           <NumerologyCard
             lifePath={displayData.numerology.lifePath}
             destiny={displayData.numerology.destiny}

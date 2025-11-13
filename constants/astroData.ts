@@ -64,4 +64,5 @@ export const PLACEHOLDER_ASTRO_DATA = {
     { planet: 'Neptune', sign: 'Pisces ♓', icon: '♆' },
     { planet: 'Pluto', sign: 'Scorpio ♏', icon: '♇' },
   ] as PlanetaryPosition[],
+  generatedAt: new Date(),
 };
