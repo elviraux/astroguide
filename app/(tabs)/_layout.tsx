@@ -14,18 +14,18 @@ export default function TabLayout() {
           backgroundColor: Colors.cosmicMidnightBlue,
           borderTopColor: `${Colors.starlightGold}30`,
           borderTopWidth: 1,
-          height: Platform.OS === 'ios' ? 105 : 100,
-          paddingBottom: Platform.OS === 'ios' ? 32 : 20,
-          paddingTop: 16,
+          height: Platform.OS === 'ios' ? 115 : 110,
+          paddingBottom: Platform.OS === 'ios' ? 36 : 24,
+          paddingTop: 18,
         },
         tabBarLabelStyle: {
           fontSize: 13,
           fontWeight: '600',
-          marginTop: 6,
-          marginBottom: 2,
+          marginTop: 7,
+          marginBottom: 3,
         },
         tabBarIconStyle: {
-          marginTop: 6,
+          marginTop: 7,
         },
       }}
     >

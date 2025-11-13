@@ -12,12 +12,11 @@ export default function WelcomeScreen() {
     <StarryBackground>
       <View style={styles.container}>
         <View style={styles.content}>
-          <View style={styles.logoPlaceholder}>
-            <Image
-              source={require('../../assets/images/onboarding/astrologer-welcome.png')}
-              style={styles.logoImage}
-            />
-          </View>
+          <Image
+            source={require('../../assets/images/onboarding/onboarding-banner.png')}
+            style={styles.bannerImage}
+            resizeMode="cover"
+          />
           <Text style={styles.appName}>Astrofly</Text>
           <Text style={styles.tagline}>Discover your cosmic blueprint.</Text>
         </View>
@@ -36,34 +35,21 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'space-between',
-    paddingTop: 120,
+    paddingTop: 80,
     paddingBottom: 60,
-    paddingHorizontal: 30,
   },
   content: {
     alignItems: 'center',
   },
-  logoPlaceholder: {
-    width: 140,
-    height: 140,
-    borderRadius: 70,
-    backgroundColor: `${Colors.mysticPurple}60`,
-    borderWidth: 2,
-    borderColor: Colors.starlightGold,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 30,
-    shadowColor: Colors.starlightGold,
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.5,
-    shadowRadius: 20,
-    elevation: 12,
-    overflow: 'hidden',
-  },
-  logoImage: {
+  bannerImage: {
     width: '100%',
-    height: '100%',
-    resizeMode: 'cover',
+    height: 240,
+    marginBottom: 40,
+    shadowColor: Colors.mysticPurple,
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.6,
+    shadowRadius: 24,
+    elevation: 15,
   },
   appName: {
     fontSize: 42,
@@ -71,6 +57,7 @@ const styles = StyleSheet.create({
     color: Colors.lunarWhite,
     marginBottom: 16,
     textAlign: 'center',
+    paddingHorizontal: 30,
   },
   tagline: {
     fontSize: 18,
@@ -79,8 +66,10 @@ const styles = StyleSheet.create({
     opacity: 0.9,
     fontWeight: '300',
     letterSpacing: 1,
+    paddingHorizontal: 30,
   },
   buttonContainer: {
     alignItems: 'center',
+    paddingHorizontal: 30,
   },
 });
