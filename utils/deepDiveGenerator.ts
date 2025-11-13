@@ -1,8 +1,8 @@
 import { AstroProfile } from './storage';
 import { saveDeepDiveContent } from './storage';
 
-const NEWELL_API_URL = 'https://newell.app/api/unified';
-const PROJECT_ID = '45895021-642c-41e2-b281-f526e3585804';
+const NEWELL_API_URL = process.env.EXPO_PUBLIC_NEWELL_API_URL || 'https://newell.staging.fastshot.ai';
+const PROJECT_ID = process.env.EXPO_PUBLIC_PROJECT_ID || '45895021-642c-41e2-b281-f526e3585804';
 
 interface DeepDiveItem {
   key: string;
@@ -94,20 +94,14 @@ export const generateAllDeepDives = async (profile: AstroProfile): Promise<void>
  */
 const generateDeepDiveContent = async (prompt: string): Promise<string> => {
   try {
-    const response = await fetch(NEWELL_API_URL, {
+    const response = await fetch(`${NEWELL_API_URL}/v1/generate/text`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
         project_id: PROJECT_ID,
-        action: 'generate_text',
-        messages: [
-          {
-            role: 'user',
-            content: prompt,
-          },
-        ],
+        prompt: prompt,
         max_tokens: 250,
         temperature: 0.7,
       }),
@@ -117,10 +111,9 @@ const generateDeepDiveContent = async (prompt: string): Promise<string> => {
       throw new Error('Failed to generate content');
     }
 
-    const data = await response.json();
-    const content = data.content || data.text || '';
+    const content = await response.text();
 
-    if (!content) {
+    if (!content || !content.trim()) {
       throw new Error('No content in response');
     }
 

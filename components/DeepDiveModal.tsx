@@ -26,8 +26,8 @@ interface DeepDiveModalProps {
   generatePrompt: string;
 }
 
-const NEWELL_API_URL = 'https://newell.app/api/unified';
-const PROJECT_ID = '45895021-642c-41e2-b281-f526e3585804';
+const NEWELL_API_URL = process.env.EXPO_PUBLIC_NEWELL_API_URL || 'https://newell.staging.fastshot.ai';
+const PROJECT_ID = process.env.EXPO_PUBLIC_PROJECT_ID || '45895021-642c-41e2-b281-f526e3585804';
 
 const DeepDiveModal: React.FC<DeepDiveModalProps> = ({
   visible,
@@ -135,20 +135,14 @@ const DeepDiveModal: React.FC<DeepDiveModalProps> = ({
       setLoading(true);
       console.log('Generating deep dive content for:', itemKey);
 
-      const response = await fetch(NEWELL_API_URL, {
+      const response = await fetch(`${NEWELL_API_URL}/v1/generate/text`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           project_id: PROJECT_ID,
-          action: 'generate_text',
-          messages: [
-            {
-              role: 'user',
-              content: generatePrompt,
-            },
-          ],
+          prompt: generatePrompt,
           max_tokens: 250,
           temperature: 0.7,
         }),
@@ -162,35 +156,16 @@ const DeepDiveModal: React.FC<DeepDiveModalProps> = ({
         throw new Error(`Failed to generate content: ${response.status}`);
       }
 
-      const data = await response.json();
-      console.log('API response data:', data);
-
-      // Try multiple possible response formats
-      let generatedContent = '';
-      if (typeof data === 'string') {
-        generatedContent = data;
-      } else if (data.content) {
-        generatedContent = data.content;
-      } else if (data.text) {
-        generatedContent = data.text;
-      } else if (data.response) {
-        generatedContent = data.response;
-      } else if (data.message) {
-        generatedContent = data.message;
-      } else if (data.choices && data.choices[0]?.message?.content) {
-        // OpenAI-style response format
-        generatedContent = data.choices[0].message.content;
-      } else if (data.choices && data.choices[0]?.text) {
-        generatedContent = data.choices[0].text;
-      }
+      // The API returns plain text response
+      const generatedContent = await response.text();
+      console.log('API response received, length:', generatedContent.length);
 
       if (generatedContent && generatedContent.trim()) {
-        console.log('Successfully generated content, length:', generatedContent.length);
         setContent(generatedContent);
         // Save to cache for instant future access
         await saveDeepDiveContent(itemKey, generatedContent);
+        console.log('Successfully generated and cached content for:', itemKey);
       } else {
-        console.error('No content found in response:', JSON.stringify(data));
         setContent('Unable to generate deep dive content at this time. Please try again later.');
       }
     } catch (error) {
