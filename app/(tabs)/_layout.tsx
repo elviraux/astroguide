@@ -14,18 +14,17 @@ export default function TabLayout() {
           backgroundColor: Colors.cosmicMidnightBlue,
           borderTopColor: `${Colors.starlightGold}30`,
           borderTopWidth: 1,
-          height: Platform.OS === 'ios' ? 115 : 110,
-          paddingBottom: Platform.OS === 'ios' ? 36 : 24,
-          paddingTop: 18,
+          height: Platform.OS === 'ios' ? 85 : 75,
+          paddingBottom: Platform.OS === 'ios' ? 24 : 12,
+          paddingTop: 10,
         },
         tabBarLabelStyle: {
-          fontSize: 13,
+          fontSize: 12,
           fontWeight: '600',
-          marginTop: 7,
-          marginBottom: 3,
+          marginTop: 4,
         },
         tabBarIconStyle: {
-          marginTop: 7,
+          marginTop: 4,
         },
       }}
     >
@@ -34,7 +33,7 @@ export default function TabLayout() {
         options={{
           title: 'Home',
           tabBarIcon: ({ color }) => (
-            <Ionicons name="home-outline" size={28} color={color} />
+            <Ionicons name="home-outline" size={24} color={color} />
           ),
         }}
       />
@@ -43,7 +42,7 @@ export default function TabLayout() {
         options={{
           title: 'Chat',
           tabBarIcon: ({ color }) => (
-            <Ionicons name="chatbubble-outline" size={28} color={color} />
+            <Ionicons name="chatbubble-outline" size={24} color={color} />
           ),
         }}
       />
@@ -52,7 +51,7 @@ export default function TabLayout() {
         options={{
           title: 'Profile',
           tabBarIcon: ({ color }) => (
-            <Ionicons name="person-outline" size={28} color={color} />
+            <Ionicons name="person-outline" size={24} color={color} />
           ),
         }}
       />
