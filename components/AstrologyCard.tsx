@@ -1,21 +1,14 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useRef, useEffect } from 'react';
 import {
   View,
   Text,
   StyleSheet,
-  TouchableOpacity,
+  ScrollView,
   Animated,
   Image,
-  LayoutAnimation,
-  Platform,
-  UIManager,
 } from 'react-native';
 import { Colors } from '../constants/colors';
 import { AstrologicalSign } from '../constants/astroData';
-
-if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
-  UIManager.setLayoutAnimationEnabledExperimental(true);
-}
 
 interface AstrologyCardProps {
   bigThree: Record<'sun' | 'moon' | 'rising', AstrologicalSign>;
@@ -24,28 +17,28 @@ interface AstrologyCardProps {
 const SignItem: React.FC<{
   type: 'sun' | 'moon' | 'rising';
   sign: AstrologicalSign;
-}> = ({ type, sign }) => {
-  const [expanded, setExpanded] = useState(false);
-  const pulseAnim = useRef(new Animated.Value(1)).current;
+  title: string;
+}> = ({ type, sign, title }) => {
+  const glowAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
-    const pulse = Animated.loop(
+    const glow = Animated.loop(
       Animated.sequence([
-        Animated.timing(pulseAnim, {
-          toValue: 1.1,
+        Animated.timing(glowAnim, {
+          toValue: 1,
           duration: 2000,
           useNativeDriver: true,
         }),
-        Animated.timing(pulseAnim, {
-          toValue: 1,
+        Animated.timing(glowAnim, {
+          toValue: 0,
           duration: 2000,
           useNativeDriver: true,
         }),
       ])
     );
-    pulse.start();
-    return () => pulse.stop();
-  }, [pulseAnim]);
+    glow.start();
+    return () => glow.stop();
+  }, [glowAnim]);
 
   const iconSource = {
     sun: require('../assets/images/cosmic/sun-sign.png'),
@@ -53,33 +46,19 @@ const SignItem: React.FC<{
     rising: require('../assets/images/cosmic/rising-sign.png'),
   };
 
-  const toggleExpanded = () => {
-    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    setExpanded(!expanded);
-  };
+  const glowOpacity = glowAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0.3, 0.6],
+  });
 
   return (
-    <TouchableOpacity
-      style={styles.signItem}
-      onPress={toggleExpanded}
-      activeOpacity={0.8}
-    >
-      <View style={styles.imageSection}>
-        <Animated.View style={[styles.iconContainer, { transform: [{ scale: pulseAnim }] }]}>
-          <Image source={iconSource[type]} style={styles.icon} />
-        </Animated.View>
-      </View>
-      <View style={styles.textSection}>
-        <Text style={styles.signLabel}>{sign.name}</Text>
-        <Text style={styles.signValue}>{sign.sign}</Text>
-        <Text style={styles.expandIcon}>{expanded ? '−' : '+'}</Text>
-      </View>
-      {expanded && (
-        <View style={styles.descriptionContainer}>
-          <Text style={styles.description}>{sign.description}</Text>
-        </View>
-      )}
-    </TouchableOpacity>
+    <View style={styles.signItem}>
+      <Animated.View style={[styles.iconContainer, { shadowOpacity: glowOpacity }]}>
+        <Image source={iconSource[type]} style={styles.icon} />
+      </Animated.View>
+      <Text style={styles.signTitle}>{title}</Text>
+      <Text style={styles.signValue}>{sign.sign}</Text>
+    </View>
   );
 };
 
@@ -88,11 +67,16 @@ const AstrologyCard: React.FC<AstrologyCardProps> = ({ bigThree }) => {
     <View style={styles.card}>
       <Text style={styles.cardTitle}>Your Astrological Profile</Text>
       <Text style={styles.cardSubtitle}>The Big Three</Text>
-      <View style={styles.signsContainer}>
-        <SignItem type="sun" sign={bigThree.sun} />
-        <SignItem type="moon" sign={bigThree.moon} />
-        <SignItem type="rising" sign={bigThree.rising} />
-      </View>
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={styles.scrollContent}
+        style={styles.scrollView}
+      >
+        <SignItem type="sun" sign={bigThree.sun} title="Sun" />
+        <SignItem type="moon" sign={bigThree.moon} title="Moon" />
+        <SignItem type="rising" sign={bigThree.rising} title="Rising" />
+      </ScrollView>
     </View>
   );
 };
@@ -124,81 +108,59 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     fontWeight: '500',
   },
-  signsContainer: {
-    gap: 20,
+  scrollView: {
+    marginTop: 4,
+  },
+  scrollContent: {
+    paddingRight: 20,
+    gap: 16,
   },
   signItem: {
+    width: 140,
     backgroundColor: `${Colors.cosmicMidnightBlue}80`,
-    borderRadius: 20,
-    padding: 24,
+    borderRadius: 16,
+    padding: 16,
     borderWidth: 1,
-    borderColor: `${Colors.starlightGold}40`,
-    overflow: 'hidden',
-    shadowColor: Colors.starlightGold,
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.3,
-    shadowRadius: 12,
-    elevation: 8,
-  },
-  imageSection: {
+    borderColor: `${Colors.starlightGold}30`,
     alignItems: 'center',
-    marginBottom: 20,
+    shadowColor: Colors.starlightGold,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 5,
   },
   iconContainer: {
-    width: 160,
-    height: 160,
+    width: 80,
+    height: 80,
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: `${Colors.cosmicMidnightBlue}40`,
-    borderRadius: 80,
-    padding: 20,
-    shadowColor: Colors.mysticPurple,
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.5,
-    shadowRadius: 16,
-    elevation: 10,
+    borderRadius: 40,
+    padding: 12,
+    marginBottom: 12,
+    shadowColor: Colors.starlightGold,
+    shadowOffset: { width: 0, height: 4 },
+    shadowRadius: 8,
+    elevation: 4,
   },
   icon: {
     width: '100%',
     height: '100%',
     resizeMode: 'contain',
   },
-  textSection: {
-    alignItems: 'center',
-    position: 'relative',
-  },
-  signLabel: {
-    fontSize: 14,
+  signTitle: {
+    fontSize: 12,
     color: Colors.starlightGold,
-    marginBottom: 8,
+    marginBottom: 4,
     fontWeight: '600',
-    letterSpacing: 1,
+    letterSpacing: 0.5,
     textTransform: 'uppercase',
   },
   signValue: {
-    fontSize: 26,
+    fontSize: 16,
     color: Colors.lunarWhite,
     fontWeight: '700',
-    marginBottom: 4,
-  },
-  expandIcon: {
-    fontSize: 20,
-    color: Colors.starlightGold,
-    fontWeight: '300',
-    marginTop: 8,
-    opacity: 0.7,
-  },
-  descriptionContainer: {
-    marginTop: 12,
-    paddingTop: 12,
-    borderTopWidth: 1,
-    borderTopColor: `${Colors.starlightGold}20`,
-  },
-  description: {
-    fontSize: 14,
-    color: Colors.lunarWhite,
-    lineHeight: 20,
-    opacity: 0.9,
+    textAlign: 'center',
   },
 });
 

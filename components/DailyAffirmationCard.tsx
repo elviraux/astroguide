@@ -40,8 +40,7 @@ const ShimmerPlaceholder: React.FC = () => {
 
   return (
     <View style={styles.shimmerContainer}>
-      <Animated.View style={[styles.shimmerLine, { opacity, width: '95%' }]} />
-      <Animated.View style={[styles.shimmerLine, { opacity, width: '85%' }]} />
+      <Animated.View style={[styles.shimmerLine, { opacity, width: '70%' }]} />
     </View>
   );
 };
@@ -84,17 +83,16 @@ const DailyAffirmationCard: React.FC<DailyAffirmationCardProps> = ({
       await generateAffirmation();
     } catch (error) {
       console.error('Error loading affirmation:', error);
-      setAffirmation('I embrace my unique path and trust in my cosmic journey.');
+      setAffirmation('I radiate confidence and embrace my power.');
       setLoading(false);
     }
   };
 
   const generateAffirmation = async () => {
     try {
-      const prompt = `Create a powerful, positive daily affirmation for someone with Sun in ${sunSign} and Life Path ${lifePath}.
-The affirmation should be empowering, personal, and present-tense.
-Keep it to 1-2 sentences. Start with I or My.
-Do not mention the zodiac sign or life path number in the affirmation itself.`;
+      const prompt = `Create a very short, powerful daily affirmation for someone with Sun in ${sunSign} and Life Path ${lifePath}.
+Keep it to ONE short sentence or phrase (maximum 10 words). Make it empowering, personal, and present-tense.
+Start with I or My. Do not mention the zodiac sign or life path number.`;
 
       const response = await fetch(`${NEWELL_API_URL}/v1/generate/text`, {
         method: 'POST',
@@ -104,7 +102,7 @@ Do not mention the zodiac sign or life path number in the affirmation itself.`;
         body: JSON.stringify({
           project_id: PROJECT_ID,
           prompt,
-          max_tokens: 100,
+          max_tokens: 50,
           temperature: 0.9,
         }),
       });
@@ -118,7 +116,7 @@ Do not mention the zodiac sign or life path number in the affirmation itself.`;
       setAffirmation(generatedAffirmation);
     } catch (error) {
       console.error('Error generating affirmation:', error);
-      setAffirmation('I embrace my unique gifts and radiate confidence in all that I do.');
+      setAffirmation('I radiate confidence and embrace my power.');
     } finally {
       setLoading(false);
     }

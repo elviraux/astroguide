@@ -39,9 +39,7 @@ const ShimmerPlaceholder: React.FC = () => {
 
   return (
     <View style={styles.shimmerContainer}>
-      <Animated.View style={[styles.shimmerLine, { opacity, width: '100%' }]} />
       <Animated.View style={[styles.shimmerLine, { opacity, width: '90%' }]} />
-      <Animated.View style={[styles.shimmerLine, { opacity, width: '80%' }]} />
     </View>
   );
 };
@@ -80,15 +78,15 @@ const TodayInsightCard: React.FC<TodayInsightCardProps> = ({ sunSign = 'Aries' }
       await generateInsight();
     } catch (error) {
       console.error('Error loading insight:', error);
-      setInsight('Your cosmic energy is strong today. Trust your intuition.');
+      setInsight('Trust your intuition today and embrace new opportunities.');
       setLoading(false);
     }
   };
 
   const generateInsight = async () => {
     try {
-      const prompt = `Generate a brief, inspiring daily cosmic insight for someone with their Sun in ${sunSign}.
-Focus on today's energy and opportunities. Keep it to 2-3 sentences, warm and encouraging.
+      const prompt = `Generate a single, powerful, inspiring cosmic insight for someone with their Sun in ${sunSign}.
+Keep it to ONE impactful sentence only. Make it warm, encouraging, and actionable.
 Do not use phrases like "As a ${sunSign}" or mention the sign name. Make it personal and direct.`;
 
       const response = await fetch(`${NEWELL_API_URL}/v1/generate/text`, {
@@ -99,7 +97,7 @@ Do not use phrases like "As a ${sunSign}" or mention the sign name. Make it pers
         body: JSON.stringify({
           project_id: PROJECT_ID,
           prompt,
-          max_tokens: 150,
+          max_tokens: 80,
           temperature: 0.8,
         }),
       });
@@ -113,7 +111,7 @@ Do not use phrases like "As a ${sunSign}" or mention the sign name. Make it pers
       setInsight(generatedInsight);
     } catch (error) {
       console.error('Error generating insight:', error);
-      setInsight('Your cosmic energy is strong today. Trust your intuition and embrace new opportunities.');
+      setInsight('Trust your intuition today and embrace new opportunities.');
     } finally {
       setLoading(false);
     }
