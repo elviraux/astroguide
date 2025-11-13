@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 import { Colors } from '../constants/colors';
 
 interface ChatInputProps {
@@ -18,30 +18,25 @@ const ChatInput: React.FC<ChatInputProps> = ({ onSend, disabled }) => {
   };
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
-    >
-      <View style={styles.container}>
-        <TextInput
-          style={styles.input}
-          value={message}
-          onChangeText={setMessage}
-          placeholder="Ask Margo anything..."
-          placeholderTextColor={`${Colors.lunarWhite}60`}
-          multiline
-          maxLength={500}
-          editable={!disabled}
-        />
-        <TouchableOpacity
-          style={[styles.sendButton, (!message.trim() || disabled) && styles.sendButtonDisabled]}
-          onPress={handleSend}
-          disabled={!message.trim() || disabled}
-        >
-          <SendIcon />
-        </TouchableOpacity>
-      </View>
-    </KeyboardAvoidingView>
+    <View style={styles.container}>
+      <TextInput
+        style={styles.input}
+        value={message}
+        onChangeText={setMessage}
+        placeholder="Ask Margo anything..."
+        placeholderTextColor={`${Colors.lunarWhite}60`}
+        multiline
+        maxLength={500}
+        editable={!disabled}
+      />
+      <TouchableOpacity
+        style={[styles.sendButton, (!message.trim() || disabled) && styles.sendButtonDisabled]}
+        onPress={handleSend}
+        disabled={!message.trim() || disabled}
+      >
+        <SendIcon />
+      </TouchableOpacity>
+    </View>
   );
 };
 

@@ -106,12 +106,12 @@ export default function ChatScreen() {
   const renderItem = ({ item }: { item: ChatMessageType }) => <ChatMessage message={item} />;
 
   return (
-    <KeyboardAvoidingView
-      style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
-    >
-      <StarryBackground>
+    <StarryBackground>
+      <KeyboardAvoidingView
+        style={styles.container}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
+      >
         <View style={styles.content}>
           <FlatList
             ref={flatListRef}
@@ -125,8 +125,8 @@ export default function ChatScreen() {
           />
           <ChatInput onSend={handleSend} disabled={isTyping} />
         </View>
-      </StarryBackground>
-    </KeyboardAvoidingView>
+      </KeyboardAvoidingView>
+    </StarryBackground>
   );
 }
 
