@@ -12,13 +12,13 @@ export default function WelcomeScreen() {
     <StarryBackground>
       <View style={styles.container}>
         <View style={styles.content}>
+          <Text style={styles.appName}>Astrofly</Text>
           <View style={styles.iconContainer}>
             <Image
-              source={require('../../assets/images/onboarding/astrologer-welcome.png')}
+              source={require('../../assets/images/onboarding/astro-wheel.png')}
               style={styles.iconImage}
             />
           </View>
-          <Text style={styles.appName}>Astrofly</Text>
           <Text style={styles.tagline}>Discover your cosmic blueprint.</Text>
         </View>
         <View style={styles.buttonContainer}>
@@ -36,28 +36,30 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'space-between',
-    paddingTop: 120,
+    paddingTop: 80,
     paddingBottom: 60,
     paddingHorizontal: 30,
   },
   content: {
     alignItems: 'center',
+    flex: 1,
+    justifyContent: 'center',
   },
   iconContainer: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
+    width: 240,
+    height: 240,
+    borderRadius: 120,
     backgroundColor: `${Colors.mysticPurple}60`,
-    borderWidth: 2,
+    borderWidth: 3,
     borderColor: Colors.starlightGold,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 30,
+    marginVertical: 30,
     shadowColor: Colors.starlightGold,
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.3,
-    shadowRadius: 16,
-    elevation: 10,
+    shadowOffset: { width: 0, height: 12 },
+    shadowOpacity: 0.4,
+    shadowRadius: 20,
+    elevation: 15,
     overflow: 'hidden',
   },
   iconImage: {
@@ -66,19 +68,21 @@ const styles = StyleSheet.create({
     resizeMode: 'cover',
   },
   appName: {
-    fontSize: 42,
+    fontSize: 48,
     fontWeight: '700',
     color: Colors.lunarWhite,
-    marginBottom: 16,
+    marginBottom: 20,
     textAlign: 'center',
+    letterSpacing: 2,
   },
   tagline: {
     fontSize: 18,
-    color: Colors.lunarWhite,
+    color: Colors.starlightGold,
     textAlign: 'center',
-    opacity: 0.9,
-    fontWeight: '300',
-    letterSpacing: 1,
+    opacity: 0.95,
+    fontWeight: '400',
+    letterSpacing: 1.5,
+    marginTop: 10,
   },
   buttonContainer: {
     alignItems: 'center',
