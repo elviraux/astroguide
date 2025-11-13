@@ -14,7 +14,7 @@ export default function WelcomeScreen() {
         <View style={styles.content}>
           <View style={styles.iconContainer}>
             <Image
-              source={require('../../assets/images/onboarding/astrologer-welcome.png')}
+              source={require('../../assets/images/icon.png')}
               style={styles.iconImage}
             />
           </View>
@@ -44,9 +44,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   iconContainer: {
-    width: 240,
-    height: 240,
-    borderRadius: 120,
+    width: 120,
+    height: 120,
+    borderRadius: 60,
     backgroundColor: `${Colors.mysticPurple}60`,
     borderWidth: 2,
     borderColor: Colors.starlightGold,
