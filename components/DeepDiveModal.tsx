@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '../constants/colors';
-import { getDeepDiveContent, saveDeepDiveContent } from '../utils/storage';
+import { getDeepDiveContent } from '../utils/storage';
 
 const SCREEN_HEIGHT = Dimensions.get('window').height;
 const MODAL_HEIGHT = SCREEN_HEIGHT * 0.7;
@@ -23,11 +23,8 @@ interface DeepDiveModalProps {
   title: string;
   icon: string;
   itemKey: string;
-  generatePrompt: string;
+  generatePrompt: string; // Not used anymore, kept for compatibility
 }
-
-const NEWELL_API_URL = process.env.EXPO_PUBLIC_NEWELL_API_URL || 'https://newell.staging.fastshot.ai';
-const PROJECT_ID = process.env.EXPO_PUBLIC_PROJECT_ID || '45895021-642c-41e2-b281-f526e3585804';
 
 const DeepDiveModal: React.FC<DeepDiveModalProps> = ({
   visible,
@@ -35,7 +32,6 @@ const DeepDiveModal: React.FC<DeepDiveModalProps> = ({
   title,
   icon,
   itemKey,
-  generatePrompt,
 }) => {
   const [content, setContent] = useState<string>('');
   const [loading, setLoading] = useState(false);
@@ -123,54 +119,20 @@ const DeepDiveModal: React.FC<DeepDiveModalProps> = ({
 
   const loadContent = async () => {
     try {
-      // Check cache first for instant loading
+      // Load pre-generated content from cache (generated during onboarding)
       const cachedContent = await getDeepDiveContent(itemKey);
+
       if (cachedContent) {
         setContent(cachedContent);
-        setLoading(false);
-        return;
-      }
-
-      // If not cached, generate on-demand
-      setLoading(true);
-      console.log('Generating deep dive content for:', itemKey);
-
-      const response = await fetch(`${NEWELL_API_URL}/v1/generate/text`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          project_id: PROJECT_ID,
-          prompt: generatePrompt,
-          max_tokens: 250,
-          temperature: 0.7,
-        }),
-      });
-
-      console.log('Response status:', response.status);
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error('API error response:', errorText);
-        throw new Error(`Failed to generate content: ${response.status}`);
-      }
-
-      // The API returns plain text response
-      const generatedContent = await response.text();
-      console.log('API response received, length:', generatedContent.length);
-
-      if (generatedContent && generatedContent.trim()) {
-        setContent(generatedContent);
-        // Save to cache for instant future access
-        await saveDeepDiveContent(itemKey, generatedContent);
-        console.log('Successfully generated and cached content for:', itemKey);
+        console.log('Loaded pre-generated content for:', itemKey);
       } else {
-        setContent('Unable to generate deep dive content at this time. Please try again later.');
+        // This should not happen if onboarding completed successfully
+        console.warn('Pre-generated content not found for:', itemKey);
+        setContent('This content is still being prepared. Please restart the app to complete your cosmic blueprint generation.');
       }
     } catch (error) {
       console.error('Error loading deep dive content:', error);
-      setContent('Unable to load content. Please check your connection and try again.');
+      setContent('Unable to load content. Please restart the app.');
     } finally {
       setLoading(false);
     }
@@ -229,13 +191,13 @@ const DeepDiveModal: React.FC<DeepDiveModalProps> = ({
             {loading ? (
               <View style={styles.loadingContainer}>
                 <ActivityIndicator size="large" color={Colors.starlightGold} />
-                <Text style={styles.loadingText}>Channeling cosmic wisdom...</Text>
+                <Text style={styles.loadingText}>Loading...</Text>
               </View>
             ) : content ? (
               <Text style={styles.content}>{content}</Text>
             ) : (
               <View style={styles.loadingContainer}>
-                <Text style={styles.loadingText}>Loading content...</Text>
+                <Text style={styles.loadingText}>Content unavailable</Text>
               </View>
             )}
           </View>

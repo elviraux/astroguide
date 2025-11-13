@@ -55,8 +55,13 @@ export default function ConfirmationScreen() {
       // Save the generated profile
       await saveAstroProfile(astroProfile);
 
+      // Generate ALL detailed deep dive content in batch
+      // This runs in parallel to maximize speed while keeping the loading screen visible
+      const { generateAllDeepDives } = await import('../../utils/deepDiveGenerator');
+      await generateAllDeepDives(astroProfile);
+
       // Navigate to home tabs after successful generation
-      // Detailed descriptions will be generated on-demand when user taps tiles
+      // All content is now pre-loaded and cached for instant access
       setGenerating(false);
       router.replace('/(tabs)/home');
     } catch (err) {
