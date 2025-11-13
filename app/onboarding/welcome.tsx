@@ -14,7 +14,7 @@ export default function WelcomeScreen() {
         <View style={styles.content}>
           <View style={styles.iconContainer}>
             <Image
-              source={require('../../assets/images/icon.png')}
+              source={require('../../assets/images/onboarding/astrologer-welcome.png')}
               style={styles.iconImage}
             />
           </View>
