@@ -247,3 +247,27 @@ export const saveCosmicSpotlight = async (content: string, topic: string): Promi
     throw error;
   }
 };
+
+// Deep Dive Content Storage
+const DEEP_DIVE_KEY_PREFIX = '@astroguide_deep_dive_';
+
+export const getDeepDiveContent = async (key: string): Promise<string | null> => {
+  try {
+    const storageKey = `${DEEP_DIVE_KEY_PREFIX}${key}`;
+    const content = await AsyncStorage.getItem(storageKey);
+    return content;
+  } catch (error) {
+    console.error('Error loading deep dive content:', error);
+    return null;
+  }
+};
+
+export const saveDeepDiveContent = async (key: string, content: string): Promise<void> => {
+  try {
+    const storageKey = `${DEEP_DIVE_KEY_PREFIX}${key}`;
+    await AsyncStorage.setItem(storageKey, content);
+  } catch (error) {
+    console.error('Error saving deep dive content:', error);
+    throw error;
+  }
+};

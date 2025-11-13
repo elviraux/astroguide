@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -6,9 +6,11 @@ import {
   ScrollView,
   Animated,
   Image,
+  TouchableOpacity,
 } from 'react-native';
 import { Colors } from '../constants/colors';
 import { AstrologicalSign } from '../constants/astroData';
+import DeepDiveModal from './DeepDiveModal';
 
 interface AstrologyCardProps {
   bigThree: Record<'sun' | 'moon' | 'rising', AstrologicalSign>;
@@ -18,8 +20,10 @@ const SignItem: React.FC<{
   type: 'sun' | 'moon' | 'rising';
   sign: AstrologicalSign;
   title: string;
-}> = ({ type, sign, title }) => {
+  onPress: () => void;
+}> = ({ type, sign, title, onPress }) => {
   const glowAnim = useRef(new Animated.Value(0)).current;
+  const scaleAnim = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
     const glow = Animated.loop(
@@ -51,18 +55,71 @@ const SignItem: React.FC<{
     outputRange: [0.3, 0.6],
   });
 
+  const handlePressIn = () => {
+    Animated.spring(scaleAnim, {
+      toValue: 0.95,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  const handlePressOut = () => {
+    Animated.spring(scaleAnim, {
+      toValue: 1,
+      friction: 3,
+      tension: 40,
+      useNativeDriver: true,
+    }).start();
+  };
+
   return (
-    <View style={styles.signItem}>
-      <Animated.View style={[styles.iconContainer, { shadowOpacity: glowOpacity }]}>
-        <Image source={iconSource[type]} style={styles.icon} />
+    <TouchableOpacity
+      activeOpacity={0.9}
+      onPress={onPress}
+      onPressIn={handlePressIn}
+      onPressOut={handlePressOut}
+    >
+      <Animated.View style={[styles.signItem, { transform: [{ scale: scaleAnim }] }]}>
+        <Animated.View style={[styles.iconContainer, { shadowOpacity: glowOpacity }]}>
+          <Image source={iconSource[type]} style={styles.icon} />
+        </Animated.View>
+        <Text style={styles.signTitle}>{title}</Text>
+        <Text style={styles.signValue}>{sign.sign}</Text>
       </Animated.View>
-      <Text style={styles.signTitle}>{title}</Text>
-      <Text style={styles.signValue}>{sign.sign}</Text>
-    </View>
+    </TouchableOpacity>
   );
 };
 
 const AstrologyCard: React.FC<AstrologyCardProps> = ({ bigThree }) => {
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedSign, setSelectedSign] = useState<{
+    type: 'sun' | 'moon' | 'rising';
+    sign: AstrologicalSign;
+    title: string;
+  } | null>(null);
+
+  const handleSignPress = (type: 'sun' | 'moon' | 'rising', sign: AstrologicalSign, title: string) => {
+    setSelectedSign({ type, sign, title });
+    setModalVisible(true);
+  };
+
+  const getIconForType = (type: 'sun' | 'moon' | 'rising'): string => {
+    const icons = {
+      sun: '☉',
+      moon: '☽',
+      rising: '↗',
+    };
+    return icons[type];
+  };
+
+  const getPromptForSign = (type: 'sun' | 'moon' | 'rising', sign: string): string => {
+    const prompts = {
+      sun: `Provide a deep, practical explanation of having Sun in ${sign}. Focus on core personality, self-expression, life purpose, strengths, and challenges. Write 2-3 paragraphs with actionable insights. Make it personal and empowering.`,
+      moon: `Provide a deep, practical explanation of having Moon in ${sign}. Focus on emotional nature, inner needs, instincts, comfort zones, and how they process feelings. Write 2-3 paragraphs with actionable insights. Make it personal and empowering.`,
+      rising: `Provide a deep, practical explanation of having ${sign} Rising (Ascendant). Focus on outward personality, first impressions, approach to life, physical presence, and life path. Write 2-3 paragraphs with actionable insights. Make it personal and empowering.`,
+    };
+    return prompts[type];
+  };
+
   return (
     <View style={styles.card}>
       <Text style={styles.cardTitle}>Your Astrological Profile</Text>
@@ -73,10 +130,36 @@ const AstrologyCard: React.FC<AstrologyCardProps> = ({ bigThree }) => {
         contentContainerStyle={styles.scrollContent}
         style={styles.scrollView}
       >
-        <SignItem type="sun" sign={bigThree.sun} title="Sun" />
-        <SignItem type="moon" sign={bigThree.moon} title="Moon" />
-        <SignItem type="rising" sign={bigThree.rising} title="Rising" />
+        <SignItem
+          type="sun"
+          sign={bigThree.sun}
+          title="Sun"
+          onPress={() => handleSignPress('sun', bigThree.sun, 'Sun Sign')}
+        />
+        <SignItem
+          type="moon"
+          sign={bigThree.moon}
+          title="Moon"
+          onPress={() => handleSignPress('moon', bigThree.moon, 'Moon Sign')}
+        />
+        <SignItem
+          type="rising"
+          sign={bigThree.rising}
+          title="Rising"
+          onPress={() => handleSignPress('rising', bigThree.rising, 'Rising Sign')}
+        />
       </ScrollView>
+
+      {selectedSign && (
+        <DeepDiveModal
+          visible={modalVisible}
+          onClose={() => setModalVisible(false)}
+          title={`${selectedSign.title}: ${selectedSign.sign.sign}`}
+          icon={getIconForType(selectedSign.type)}
+          itemKey={`${selectedSign.type}-${selectedSign.sign.sign.toLowerCase()}`}
+          generatePrompt={getPromptForSign(selectedSign.type, selectedSign.sign.sign)}
+        />
+      )}
     </View>
   );
 };

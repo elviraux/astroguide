@@ -1,36 +1,90 @@
-import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import React, { useState, useRef } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Animated } from 'react-native';
 import { Colors } from '../constants/colors';
 import { PlanetaryPosition } from '../constants/astroData';
+import DeepDiveModal from './DeepDiveModal';
 
 interface PlanetaryCardProps {
   positions: PlanetaryPosition[];
 }
 
-const PlanetItem: React.FC<{ position: PlanetaryPosition }> = ({ position }) => {
+const PlanetItem: React.FC<{ position: PlanetaryPosition; onPress: () => void }> = ({ position, onPress }) => {
+  const scaleAnim = useRef(new Animated.Value(1)).current;
+
+  const handlePressIn = () => {
+    Animated.spring(scaleAnim, {
+      toValue: 0.95,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  const handlePressOut = () => {
+    Animated.spring(scaleAnim, {
+      toValue: 1,
+      friction: 3,
+      tension: 40,
+      useNativeDriver: true,
+    }).start();
+  };
+
   return (
-    <View style={styles.planetItem}>
-      <View style={styles.planetIconContainer}>
-        <Text style={styles.planetIcon}>{position.icon}</Text>
-      </View>
-      <View style={styles.planetInfo}>
-        <Text style={styles.planetName}>{position.planet}</Text>
-        <Text style={styles.planetSign}>{position.sign}</Text>
-      </View>
-    </View>
+    <TouchableOpacity
+      activeOpacity={0.9}
+      onPress={onPress}
+      onPressIn={handlePressIn}
+      onPressOut={handlePressOut}
+      style={{ width: '47%' }}
+    >
+      <Animated.View style={[styles.planetItem, { transform: [{ scale: scaleAnim }] }]}>
+        <View style={styles.planetIconContainer}>
+          <Text style={styles.planetIcon}>{position.icon}</Text>
+        </View>
+        <View style={styles.planetInfo}>
+          <Text style={styles.planetName}>{position.planet}</Text>
+          <Text style={styles.planetSign}>{position.sign}</Text>
+        </View>
+      </Animated.View>
+    </TouchableOpacity>
   );
 };
 
 const PlanetaryCard: React.FC<PlanetaryCardProps> = ({ positions }) => {
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedPlanet, setSelectedPlanet] = useState<PlanetaryPosition | null>(null);
+
+  const handlePlanetPress = (position: PlanetaryPosition) => {
+    setSelectedPlanet(position);
+    setModalVisible(true);
+  };
+
+  const getPromptForPlanet = (planet: string, sign: string): string => {
+    return `Provide a deep, practical explanation of having ${planet} in ${sign}. Focus on how this placement influences the person's life, behavior, and experiences related to ${planet}'s domain. Include strengths, challenges, and actionable advice. Write 2-3 paragraphs with specific, empowering insights.`;
+  };
+
   return (
     <View style={styles.card}>
       <Text style={styles.cardTitle}>Planetary Positions</Text>
       <Text style={styles.cardSubtitle}>At the time of your birth</Text>
       <View style={styles.planetsGrid}>
         {positions.map((position, index) => (
-          <PlanetItem key={index} position={position} />
+          <PlanetItem
+            key={index}
+            position={position}
+            onPress={() => handlePlanetPress(position)}
+          />
         ))}
       </View>
+
+      {selectedPlanet && (
+        <DeepDiveModal
+          visible={modalVisible}
+          onClose={() => setModalVisible(false)}
+          title={`${selectedPlanet.planet} in ${selectedPlanet.sign}`}
+          icon={selectedPlanet.icon}
+          itemKey={`${selectedPlanet.planet.toLowerCase()}-${selectedPlanet.sign.toLowerCase()}`}
+          generatePrompt={getPromptForPlanet(selectedPlanet.planet, selectedPlanet.sign)}
+        />
+      )}
     </View>
   );
 };
@@ -68,7 +122,6 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   planetItem: {
-    width: '47%',
     backgroundColor: `${Colors.cosmicMidnightBlue}60`,
     borderRadius: 15,
     padding: 12,
