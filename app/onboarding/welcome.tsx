@@ -44,9 +44,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   iconContainer: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
+    width: 240,
+    height: 240,
+    borderRadius: 120,
     backgroundColor: `${Colors.mysticPurple}60`,
     borderWidth: 2,
     borderColor: Colors.starlightGold,
