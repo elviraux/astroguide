@@ -1,5 +1,5 @@
 export const Colors = {
-  cosmicMidnightBlue: '#191970',
+  cosmicMidnightBlue: '#0D0D1A', // Deep Void Black theme
   mysticPurple: '#483D8B',
   starlightGold: '#FFD700',
   lunarWhite: '#F5F5F5',
