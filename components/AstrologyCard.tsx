@@ -48,9 +48,9 @@ const SignItem: React.FC<{
   }, [pulseAnim]);
 
   const iconSource = {
-    sun: require('../assets/images/sun-icon.png'),
-    moon: require('../assets/images/moon-icon.png'),
-    rising: require('../assets/images/rising-icon.png'),
+    sun: require('../assets/images/cosmic/sun-sign.png'),
+    moon: require('../assets/images/cosmic/moon-sign.png'),
+    rising: require('../assets/images/cosmic/rising-sign.png'),
   };
 
   const toggleExpanded = () => {
@@ -62,16 +62,16 @@ const SignItem: React.FC<{
     <TouchableOpacity
       style={styles.signItem}
       onPress={toggleExpanded}
-      activeOpacity={0.7}
+      activeOpacity={0.8}
     >
-      <View style={styles.signHeader}>
+      <View style={styles.imageSection}>
         <Animated.View style={[styles.iconContainer, { transform: [{ scale: pulseAnim }] }]}>
           <Image source={iconSource[type]} style={styles.icon} />
         </Animated.View>
-        <View style={styles.signInfo}>
-          <Text style={styles.signLabel}>{sign.name}</Text>
-          <Text style={styles.signValue}>{sign.sign}</Text>
-        </View>
+      </View>
+      <View style={styles.textSection}>
+        <Text style={styles.signLabel}>{sign.name}</Text>
+        <Text style={styles.signValue}>{sign.sign}</Text>
         <Text style={styles.expandIcon}>{expanded ? '−' : '+'}</Text>
       </View>
       {expanded && (
@@ -125,49 +125,68 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   signsContainer: {
-    gap: 12,
+    gap: 20,
   },
   signItem: {
-    backgroundColor: `${Colors.cosmicMidnightBlue}60`,
-    borderRadius: 15,
-    padding: 16,
+    backgroundColor: `${Colors.cosmicMidnightBlue}80`,
+    borderRadius: 20,
+    padding: 24,
     borderWidth: 1,
-    borderColor: `${Colors.starlightGold}20`,
+    borderColor: `${Colors.starlightGold}40`,
+    overflow: 'hidden',
+    shadowColor: Colors.starlightGold,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.3,
+    shadowRadius: 12,
+    elevation: 8,
   },
-  signHeader: {
-    flexDirection: 'row',
+  imageSection: {
     alignItems: 'center',
+    marginBottom: 20,
   },
   iconContainer: {
-    width: 48,
-    height: 48,
-    marginRight: 16,
+    width: 160,
+    height: 160,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: `${Colors.cosmicMidnightBlue}40`,
+    borderRadius: 80,
+    padding: 20,
+    shadowColor: Colors.mysticPurple,
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.5,
+    shadowRadius: 16,
+    elevation: 10,
   },
   icon: {
     width: '100%',
     height: '100%',
     resizeMode: 'contain',
   },
-  signInfo: {
-    flex: 1,
+  textSection: {
+    alignItems: 'center',
+    position: 'relative',
   },
   signLabel: {
-    fontSize: 12,
+    fontSize: 14,
     color: Colors.starlightGold,
-    marginBottom: 4,
-    fontWeight: '500',
+    marginBottom: 8,
+    fontWeight: '600',
+    letterSpacing: 1,
+    textTransform: 'uppercase',
   },
   signValue: {
-    fontSize: 18,
+    fontSize: 26,
     color: Colors.lunarWhite,
-    fontWeight: '600',
+    fontWeight: '700',
+    marginBottom: 4,
   },
   expandIcon: {
-    fontSize: 24,
+    fontSize: 20,
     color: Colors.starlightGold,
     fontWeight: '300',
-    width: 24,
-    textAlign: 'center',
+    marginTop: 8,
+    opacity: 0.7,
   },
   descriptionContainer: {
     marginTop: 12,

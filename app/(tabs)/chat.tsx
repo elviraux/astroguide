@@ -14,7 +14,7 @@ const PROJECT_ID = process.env.EXPO_PUBLIC_PROJECT_ID || '45895021-642c-41e2-b28
 const INITIAL_MESSAGE: ChatMessageType = {
   id: 'initial',
   role: 'assistant',
-  content: "Hello, I'm Margo. I've read your chart. What cosmic questions are on your mind today?",
+  content: "Welcome to Astrofly. I'm Margo, your personal cosmic guide.",
   timestamp: new Date(),
 };
 

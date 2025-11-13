@@ -15,7 +15,7 @@ export default function WelcomeScreen() {
           <View style={styles.logoPlaceholder}>
             <Text style={styles.logoText}>✨</Text>
           </View>
-          <Text style={styles.appName}>Astroguide</Text>
+          <Text style={styles.appName}>Astrofly</Text>
           <Text style={styles.tagline}>Discover your cosmic blueprint.</Text>
         </View>
         <View style={styles.buttonContainer}>
