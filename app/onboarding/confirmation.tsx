@@ -7,7 +7,6 @@ import CosmicLoadingScreen from '../../components/CosmicLoadingScreen';
 import { Colors } from '../../constants/colors';
 import { saveUserData, saveAstroProfile } from '../../utils/storage';
 import { generateAstroProfile } from '../../utils/astroAI';
-import { generateAllDeepDives } from '../../utils/deepDiveGenerator';
 
 export default function ConfirmationScreen() {
   const router = useRouter();
@@ -50,16 +49,14 @@ export default function ConfirmationScreen() {
       setLoading(false);
       setGenerating(true);
 
-      // Generate astro profile using AI
+      // Generate astro profile using AI (summary data only)
       const astroProfile = await generateAstroProfile(userData);
 
       // Save the generated profile
       await saveAstroProfile(astroProfile);
 
-      // Generate all deep dive content in batch (runs in parallel)
-      await generateAllDeepDives(astroProfile);
-
       // Navigate to home tabs after successful generation
+      // Detailed descriptions will be generated on-demand when user taps tiles
       setGenerating(false);
       router.replace('/(tabs)/home');
     } catch (err) {
