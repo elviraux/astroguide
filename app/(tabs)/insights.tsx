@@ -3,12 +3,12 @@ import { View, Text, StyleSheet, Animated, ActivityIndicator } from 'react-nativ
 import { Colors } from '../../constants/colors';
 import { PLACEHOLDER_ASTRO_DATA } from '../../constants/astroData';
 import ParallaxBackground from '../../components/ParallaxBackground';
-import AstrologyCard from '../../components/AstrologyCard';
-import NumerologyCard from '../../components/NumerologyCard';
-import PlanetaryCard from '../../components/PlanetaryCard';
+import TodayInsightCard from '../../components/TodayInsightCard';
+import DailyAffirmationCard from '../../components/DailyAffirmationCard';
+import CosmicSpotlightCard from '../../components/CosmicSpotlightCard';
 import { getAstroProfile, AstroProfile } from '../../utils/storage';
 
-export default function HomeScreen() {
+export default function InsightsScreen() {
   const scrollY = useRef(new Animated.Value(0)).current;
   const [astroData, setAstroData] = useState<AstroProfile | null>(null);
   const [loading, setLoading] = useState(true);
@@ -33,13 +33,6 @@ export default function HomeScreen() {
   // Use generated data if available, otherwise fall back to placeholder
   const displayData = astroData || PLACEHOLDER_ASTRO_DATA;
 
-  const getTimeBasedGreeting = () => {
-    const hour = new Date().getHours();
-    if (hour < 12) return 'Good morning';
-    if (hour < 18) return 'Good afternoon';
-    return 'Good evening';
-  };
-
   if (loading) {
     return (
       <View style={[styles.container, styles.loadingContainer]}>
@@ -63,23 +56,21 @@ export default function HomeScreen() {
         >
           {/* Header */}
           <View style={styles.header}>
-            <Text style={styles.greeting}>
-              {getTimeBasedGreeting()}, {displayData.user.name}
-            </Text>
-            <Text style={styles.subtitle}>Your cosmic blueprint</Text>
+            <Text style={styles.title}>Daily Cosmic Feed</Text>
+            <Text style={styles.subtitle}>Your personalized insights for today</Text>
           </View>
 
-          {/* Astrology Profile */}
-          <AstrologyCard bigThree={displayData.bigThree} />
+          {/* Today's Insight */}
+          <TodayInsightCard sunSign={displayData.bigThree.sun.sign} />
 
-          {/* Numerology Profile */}
-          <NumerologyCard
-            lifePath={displayData.numerology.lifePath}
-            destiny={displayData.numerology.destiny}
+          {/* Daily Affirmation */}
+          <DailyAffirmationCard
+            sunSign={displayData.bigThree.sun.sign}
+            lifePath={displayData.numerology.lifePath.value}
           />
 
-          {/* Planetary Positions */}
-          <PlanetaryCard positions={displayData.planetaryPositions} />
+          {/* Cosmic Spotlight */}
+          <CosmicSpotlightCard astroProfile={displayData} />
 
           {/* Bottom spacing */}
           <View style={styles.bottomSpacer} />
@@ -108,7 +99,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     marginBottom: 30,
   },
-  greeting: {
+  title: {
     fontSize: 32,
     fontWeight: '700',
     color: Colors.lunarWhite,
