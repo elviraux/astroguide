@@ -68,6 +68,9 @@ const DeepDiveModal: React.FC<DeepDiveModalProps> = ({
 
   useEffect(() => {
     if (visible) {
+      // Reset state when modal opens
+      setContent('');
+      setLoading(true);
       openModal();
       loadContent();
     } else {
@@ -83,7 +86,7 @@ const DeepDiveModal: React.FC<DeepDiveModalProps> = ({
       }).start();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [visible]);
+  }, [visible, itemKey]);
 
   const openModal = () => {
     Animated.parallel([
@@ -130,6 +133,8 @@ const DeepDiveModal: React.FC<DeepDiveModalProps> = ({
 
       // If not cached, generate on-demand
       setLoading(true);
+      console.log('Generating deep dive content for:', itemKey);
+
       const response = await fetch(NEWELL_API_URL, {
         method: 'POST',
         headers: {
@@ -149,18 +154,43 @@ const DeepDiveModal: React.FC<DeepDiveModalProps> = ({
         }),
       });
 
+      console.log('Response status:', response.status);
+
       if (!response.ok) {
-        throw new Error('Failed to generate content');
+        const errorText = await response.text();
+        console.error('API error response:', errorText);
+        throw new Error(`Failed to generate content: ${response.status}`);
       }
 
       const data = await response.json();
-      const generatedContent = data.content || data.text || '';
+      console.log('API response data:', data);
 
-      if (generatedContent) {
+      // Try multiple possible response formats
+      let generatedContent = '';
+      if (typeof data === 'string') {
+        generatedContent = data;
+      } else if (data.content) {
+        generatedContent = data.content;
+      } else if (data.text) {
+        generatedContent = data.text;
+      } else if (data.response) {
+        generatedContent = data.response;
+      } else if (data.message) {
+        generatedContent = data.message;
+      } else if (data.choices && data.choices[0]?.message?.content) {
+        // OpenAI-style response format
+        generatedContent = data.choices[0].message.content;
+      } else if (data.choices && data.choices[0]?.text) {
+        generatedContent = data.choices[0].text;
+      }
+
+      if (generatedContent && generatedContent.trim()) {
+        console.log('Successfully generated content, length:', generatedContent.length);
         setContent(generatedContent);
         // Save to cache for instant future access
         await saveDeepDiveContent(itemKey, generatedContent);
       } else {
+        console.error('No content found in response:', JSON.stringify(data));
         setContent('Unable to generate deep dive content at this time. Please try again later.');
       }
     } catch (error) {
@@ -226,8 +256,12 @@ const DeepDiveModal: React.FC<DeepDiveModalProps> = ({
                 <ActivityIndicator size="large" color={Colors.starlightGold} />
                 <Text style={styles.loadingText}>Channeling cosmic wisdom...</Text>
               </View>
-            ) : (
+            ) : content ? (
               <Text style={styles.content}>{content}</Text>
+            ) : (
+              <View style={styles.loadingContainer}>
+                <Text style={styles.loadingText}>Loading content...</Text>
+              </View>
             )}
           </View>
         </Animated.View>
