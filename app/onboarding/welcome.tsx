@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Image } from 'react-native';
 import { useRouter } from 'expo-router';
 import StarryBackground from '../../components/StarryBackground';
 import CosmicButton from '../../components/CosmicButton';
@@ -13,7 +13,10 @@ export default function WelcomeScreen() {
       <View style={styles.container}>
         <View style={styles.content}>
           <View style={styles.logoPlaceholder}>
-            <Text style={styles.logoText}>✨</Text>
+            <Image
+              source={require('../../assets/images/onboarding/astrologer-welcome.png')}
+              style={styles.logoImage}
+            />
           </View>
           <Text style={styles.appName}>Astrofly</Text>
           <Text style={styles.tagline}>Discover your cosmic blueprint.</Text>
@@ -41,9 +44,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   logoPlaceholder: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
+    width: 140,
+    height: 140,
+    borderRadius: 70,
     backgroundColor: `${Colors.mysticPurple}60`,
     borderWidth: 2,
     borderColor: Colors.starlightGold,
@@ -52,12 +55,15 @@ const styles = StyleSheet.create({
     marginBottom: 30,
     shadowColor: Colors.starlightGold,
     shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.3,
-    shadowRadius: 16,
-    elevation: 10,
+    shadowOpacity: 0.5,
+    shadowRadius: 20,
+    elevation: 12,
+    overflow: 'hidden',
   },
-  logoText: {
-    fontSize: 60,
+  logoImage: {
+    width: '100%',
+    height: '100%',
+    resizeMode: 'cover',
   },
   appName: {
     fontSize: 42,
