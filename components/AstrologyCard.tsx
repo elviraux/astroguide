@@ -11,6 +11,7 @@ import {
 import { Colors } from '../constants/colors';
 import { AstrologicalSign } from '../constants/astroData';
 import DeepDiveModal from './DeepDiveModal';
+import { normalizeKey } from '../utils/deepDiveGenerator';
 
 interface AstrologyCardProps {
   bigThree: Record<'sun' | 'moon' | 'rising', AstrologicalSign>;
@@ -156,7 +157,7 @@ const AstrologyCard: React.FC<AstrologyCardProps> = ({ bigThree }) => {
           onClose={() => setModalVisible(false)}
           title={`${selectedSign.title}: ${selectedSign.sign.sign}`}
           icon={getIconForType(selectedSign.type)}
-          itemKey={`${selectedSign.type}-${selectedSign.sign.sign.toLowerCase()}`}
+          itemKey={`${selectedSign.type}-${normalizeKey(selectedSign.sign.sign)}`}
           generatePrompt={getPromptForSign(selectedSign.type, selectedSign.sign.sign)}
         />
       )}

@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, Animated } from 'react-native
 import { Colors } from '../constants/colors';
 import { PlanetaryPosition } from '../constants/astroData';
 import DeepDiveModal from './DeepDiveModal';
+import { normalizeKey } from '../utils/deepDiveGenerator';
 
 interface PlanetaryCardProps {
   positions: PlanetaryPosition[];
@@ -81,7 +82,7 @@ const PlanetaryCard: React.FC<PlanetaryCardProps> = ({ positions }) => {
           onClose={() => setModalVisible(false)}
           title={`${selectedPlanet.planet} in ${selectedPlanet.sign}`}
           icon={selectedPlanet.icon}
-          itemKey={`${selectedPlanet.planet.toLowerCase()}-${selectedPlanet.sign.toLowerCase()}`}
+          itemKey={`${normalizeKey(selectedPlanet.planet)}-${normalizeKey(selectedPlanet.sign)}`}
           generatePrompt={getPromptForPlanet(selectedPlanet.planet, selectedPlanet.sign)}
         />
       )}

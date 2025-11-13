@@ -8,11 +8,10 @@ import {
   Animated,
   Dimensions,
   PanResponder,
-  ActivityIndicator,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '../constants/colors';
-import { getDeepDiveContent, saveDeepDiveContent } from '../utils/storage';
+import { getDeepDiveContent } from '../utils/storage';
 
 const SCREEN_HEIGHT = Dimensions.get('window').height;
 const MODAL_HEIGHT = SCREEN_HEIGHT * 0.7;
@@ -26,19 +25,14 @@ interface DeepDiveModalProps {
   generatePrompt: string;
 }
 
-const NEWELL_API_URL = 'https://newell.app/api/unified';
-const PROJECT_ID = '45895021-642c-41e2-b281-f526e3585804';
-
 const DeepDiveModal: React.FC<DeepDiveModalProps> = ({
   visible,
   onClose,
   title,
   icon,
   itemKey,
-  generatePrompt,
 }) => {
   const [content, setContent] = useState<string>('');
-  const [loading, setLoading] = useState(false);
   const translateY = useRef(new Animated.Value(MODAL_HEIGHT)).current;
   const backdropOpacity = useRef(new Animated.Value(0)).current;
 
@@ -120,52 +114,17 @@ const DeepDiveModal: React.FC<DeepDiveModalProps> = ({
 
   const loadContent = async () => {
     try {
-      // Check cache first
+      // Load pre-generated content from cache
       const cachedContent = await getDeepDiveContent(itemKey);
       if (cachedContent) {
         setContent(cachedContent);
-        return;
-      }
-
-      // Generate new content
-      setLoading(true);
-      const response = await fetch(NEWELL_API_URL, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          project_id: PROJECT_ID,
-          action: 'generate_text',
-          messages: [
-            {
-              role: 'user',
-              content: generatePrompt,
-            },
-          ],
-          max_tokens: 250,
-          temperature: 0.7,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to generate content');
-      }
-
-      const data = await response.json();
-      const generatedContent = data.content || data.text || '';
-
-      if (generatedContent) {
-        setContent(generatedContent);
-        await saveDeepDiveContent(itemKey, generatedContent);
       } else {
-        setContent('Unable to generate deep dive content at this time. Please try again later.');
+        // Fallback if content wasn't generated during onboarding
+        setContent('Content is being prepared. Please try again in a moment.');
       }
     } catch (error) {
       console.error('Error loading deep dive content:', error);
-      setContent('Unable to load content. Please check your connection and try again.');
-    } finally {
-      setLoading(false);
+      setContent('Unable to load content. Please try again.');
     }
   };
 
@@ -219,14 +178,7 @@ const DeepDiveModal: React.FC<DeepDiveModalProps> = ({
 
           {/* Content */}
           <View style={styles.contentContainer}>
-            {loading ? (
-              <View style={styles.loadingContainer}>
-                <ActivityIndicator size="large" color={Colors.starlightGold} />
-                <Text style={styles.loadingText}>Channeling cosmic wisdom...</Text>
-              </View>
-            ) : (
-              <Text style={styles.content}>{content}</Text>
-            )}
+            <Text style={styles.content}>{content}</Text>
           </View>
         </Animated.View>
       </View>
@@ -299,17 +251,6 @@ const styles = StyleSheet.create({
   contentContainer: {
     flex: 1,
     padding: 24,
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    gap: 16,
-  },
-  loadingText: {
-    fontSize: 16,
-    color: Colors.starlightGold,
-    fontWeight: '500',
   },
   content: {
     fontSize: 16,
